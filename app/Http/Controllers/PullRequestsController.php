@@ -53,4 +53,40 @@ class PullRequestsController extends Controller
     ], 200);
   }
 
+  public function review(){
+    $review_requests = [];
+    $page_number = 1;
+    while(true){
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $headers = ([
+        'Accept:application/vnd.github+json',
+        'User-Agent:mohammad-kassem'
+      ]);
+
+      $requests = $this->curl($url, $headers);
+
+      if ($requests and !count($requests)) {
+        break;
+      }
+
+      foreach ($requests as $request) {
+        if (!count($request->requested_reviewers) or !count($request->requested_teams)){
+          $review_request = ([
+            'id' => $request->id,
+            'title' => $request->title,
+            'url' => $request->url,
+            'user' => $request->user->login,
+            'created_at' => $request->created_at,
+          ]);
+        array_push($review_requests, $review_request);
+        $request_imploded = implode(",", $review_request);
+        file_put_contents('review-required-pull-requests.txt', "\n".$request_imploded,FILE_APPEND);
+        }
+      }
+      $page_number++;
+    }
+    return response()->json([
+      'requests' => $review_requests
+    ], 200);  
+  }
 }
