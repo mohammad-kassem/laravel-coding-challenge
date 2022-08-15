@@ -19,8 +19,9 @@ class PullRequestsController extends Controller
 
   public function old(){
     $old_requests = [];
-    for ($page_number = 1; $page_number < 2; $page_number++){
-      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+    $page_number = 1;
+    while(true){
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=100&page='.$page_number;
       $headers = ([
         'Accept:application/vnd.github+json',
         'User-Agent:mohammad-kasem'
@@ -47,6 +48,7 @@ class PullRequestsController extends Controller
           file_put_contents('old-pull-requests.txt', "\n".$request_imploded,FILE_APPEND);
         }
       }
+      $page_number++;
     }
     return response()->json([
       'requests' => $old_requests
@@ -57,15 +59,14 @@ class PullRequestsController extends Controller
     $review_requests = [];
     $page_number = 1;
     while(true){
-      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=100&page='.$page_number;
       $headers = ([
         'Accept:application/vnd.github+json',
         'User-Agent:mohammad-kassem'
       ]);
 
       $requests = $this->curl($url, $headers);
-
-      if ($requests and !count($requests)) {
+      if (!count($requests)) {
         break;
       }
 
@@ -94,15 +95,14 @@ class PullRequestsController extends Controller
     $status_requests = [];
     $page_number = 1;
     while(true){
-      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=100&page='.$page_number;
       $headers = ([
         'Accept:application/vnd.github+json',
         'User-Agent:mohammad-kassem'
       ]);
 
       $requests = $this->curl($url, $headers);
-
-      if ($requests and !count($requests)) {
+      if (!count($requests)) {
         break;
       }
 
@@ -133,15 +133,14 @@ class PullRequestsController extends Controller
     $unassigned_requests = [];
     $page_number = 1;
     while(true){
-      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=100&page='.$page_number;
       $headers = ([
         'Accept:application/vnd.github+json',
         'User-Agent:mohammad-kassem'
       ]);
 
       $requests = $this->curl($url, $headers);
-
-      if ($requests and !count($requests)) {
+      if (!count($requests)) {
         break;
       }
 
