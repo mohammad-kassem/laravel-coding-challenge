@@ -6,7 +6,7 @@ A small Laravel application that fetches a few pieces of data from the free/publ
 
 - <a href="https://www.laravel.com/"> <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white"/> </a>
 
-### How It Works:
+### How It Works
 
 - All methods call the GitHub API's pulls method. The Github API is made with pagination and can only display only a maximum of 100 data items per call. The way the data is fetched is by looping through fetching data from the API on each iteration until we receive an empty array response, in which there are no more data to fetch, so the loop terminates.
 
