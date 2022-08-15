@@ -89,4 +89,44 @@ class PullRequestsController extends Controller
       'requests' => $review_requests
     ], 200);  
   }
+
+  public function status(){
+    $status_requests = [];
+    $page_number = 1;
+    while(true){
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $headers = ([
+        'Accept:application/vnd.github+json',
+        'User-Agent:mohammad-kassem'
+      ]);
+
+      $requests = $this->curl($url, $headers);
+
+      if ($requests and !count($requests)) {
+        break;
+      }
+
+      foreach ($requests as $request) {
+        $status_url = 'https://api.github.com/repos/woocommerce/woocommerce/commits/'.$request->merge_commit_sha.'/status';
+        $status = $this->curl($status_url, $headers)->state;
+        if ($status == "success"){
+          $status_request = ([
+            'id' => $request->id,
+            'title' => $request->title,
+            'url' => $request->url,
+            'user' => $request->user->login,
+            'created_at' => $request->created_at,
+          ]);
+        array_push($status_requests, $status_request);
+        $request_imploded = implode(",", $status_request);
+        file_put_contents('status-success-pull-requests.txt', "\n".$request_imploded,FILE_APPEND);
+        }
+      }
+      $page_number++;
+    }
+    return response()->json([
+      'requests' => $status_requests
+    ], 200);
+  }
+
 }
