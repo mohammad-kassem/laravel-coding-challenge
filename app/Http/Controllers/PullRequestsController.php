@@ -129,4 +129,40 @@ class PullRequestsController extends Controller
     ], 200);
   }
 
+  public function unassigned(){
+    $unassigned_requests = [];
+    $page_number = 1;
+    while(true){
+      $url = 'https://api.github.com/repos/woocommerce/woocommerce/pulls?state=open&per_page=30&page='.$page_number;
+      $headers = ([
+        'Accept:application/vnd.github+json',
+        'User-Agent:mohammad-kassem'
+      ]);
+
+      $requests = $this->curl($url, $headers);
+
+      if ($requests and !count($requests)) {
+        break;
+      }
+
+      foreach ($requests as $request) {
+        if (!$request->assignee or !count($request->assignees)){
+          $unassigned_request = ([
+            'id' => $request->id,
+            'title' => $request->title,
+            'url' => $request->url,
+            'user' => $request->user->login,
+            'created_at' => $request->created_at,
+          ]);
+        array_push($unassigned_requests, $unassigned_request);
+        $request_imploded = implode(",", $unassigned_request);
+        file_put_contents('not-assigned-pull-requests.txt', "\n".$request_imploded,FILE_APPEND);
+        }
+      }
+      $page_number++;
+    }
+    return response()->json([
+      'requests' => $unassigned_requests
+    ], 200);
+  }
 }
